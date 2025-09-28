@@ -1,0 +1,68 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:16
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 10s
+      retries: 5
+      start_period: 2s
+      timeout: 10s
+    container_name: postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+
+  embed-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.gpu
+    image: embed-api:latest
+    environment:
+      HF_HUB_CACHE: /tmp/.cache/huggingface/hub
+    ports:
+      - "8005:8000"
+    command: uv run uvicorn clip_service.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./clip_service:/app/clip_service
+      - ~/.cache/huggingface/hub:/tmp/.cache/huggingface/hub
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]  
+      interval: 15s      
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+
+  backend-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.cpu
+    image: backend-api:latest
+    environment:
+      DATABASE_URL: postgresql+asyncpg://postgres:password@postgres:5432/image_search
+      EMBED_SERVER_URL: http://embed-api:8000
+      IMAGE_DIR: /app/imgs
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "uv run alembic upgrade head &&
+             uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    volumes:
+      - ./app:/app/app
+      - ./imgs:/app/imgs
+      - ./.lancedb:/app/.lancedb
+      - ./alembic:/app/alembic
+    depends_on:
+      postgres:
+        condition: service_healthy
+      embed-api:
+        condition: service_healthy
+
+volumes:
+  pg_data:
