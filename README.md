@@ -20,7 +20,7 @@ A REST API built for real-time image search.
 
 ## Why LanceDB?
 
-LanceDB is a vector database that is designed to be fast and efficient. It is built on top of Lance, a modern columnar data format and designed to handle multimodal data with a lakehouse-style architecture. Since the storage (and indices) is on disk, it is more cost-effective than in-memory databases. LancdDb also supports multple storage backend from cloud object storage to local disk.
+LanceDB is a vector database that is designed to be fast and efficient. It is built on top of Lance, a modern columnar data format and designed to handle multimodal data with a lakehouse-style architecture. Since the storage (and indices) is on disk, it is more cost-effective than in-memory databases. LanceDB also supports multiple storage backend from cloud object storage to local disk.  
 
 ## Installation and Setup
 
@@ -31,6 +31,13 @@ LanceDB is a vector database that is designed to be fast and efficient. It is bu
 - GPU (optional, for CLIP)
 
 ### Quick Start
+
+0. **Initialize LanceDB**
+
+    Put your images in the `imgs` directory. Or change the `IMAGE_DIR` in the `app/config.py`.
+
+    LanceDB will initialize automatically when the application starts. The default table is `images` containing 328 images with embeddings and IVF-PQ index.
+
 
 1.  **Build image**
 
@@ -50,12 +57,6 @@ LanceDB is a vector database that is designed to be fast and efficient. It is bu
     The image search backend API will be available at `http://localhost:8000`. And the embedding API will be available at `http://localhost:8005`. Visit `http://{host}:{port}/docs` to see the API documentation.
 
 ## Usage Example
-
-### 0. Initialize LanceDB
-
-Put your images in the `imgs` directory. Or change the `IMAGE_DIR` in the `app/config.py`.
-
-LanceDB will initialize automatically when the application starts. The default table is `images` containing 328 images with embeddings and IVF-PQ index.
 
 ### 1. Upload an Image
 
