@@ -51,7 +51,11 @@ LanceDB is a vector database that is designed to be fast and efficient. It is bu
 
 ## Usage Example
 
-LanceDB will initialize automatically when the application starts. The default table is "images" containing 328 images with embeddings and IVF-PQ index.
+### 0. Initialize LanceDB
+
+Put your images in the `imgs` directory. Or change the `IMAGE_DIR` in the `app/config.py`.
+
+LanceDB will initialize automatically when the application starts. The default table is `images` containing 328 images with embeddings and IVF-PQ index.
 
 ### 1. Upload an Image
 
