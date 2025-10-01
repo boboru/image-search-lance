@@ -18,7 +18,10 @@ from app.database import get_session
 from app.lancedb_utils import prepare_lancedb
 from app.models import Image, Search, SearchCreate, SearchUpdate
 
-logger = logging.getLogger("uvicorn.access")
+logging.basicConfig(
+    level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s"
+)
+logger = logging.getLogger(__name__)
 
 
 class State(TypedDict):
